@@ -1,0 +1,58 @@
+# .github/workflows/ci-cd.yml
+
+name: AI-Powered Web3 DApp Discovery Platform CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    # Add additional steps for linting, type checks, etc.
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build project
+      run: npm run build
+
+    - name: Deploy to server
+      run: |
+        # Add your deployment script here
+        # For example, using SSH to deploy to a remote server:
+        # ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} 'deploy-script.sh'
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
